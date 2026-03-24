@@ -17,7 +17,7 @@ public class ProRequest {
     @NotNull(message = "Category is required")
     private ProductCategory category;
 
-    @Positive(message = "Product MRP must be required")
+    @Positive(message = "Product MRP must be grater than 0")
     @NotNull(message = "Product MRP must be required")
     private Double mrp;
 
@@ -27,7 +27,7 @@ public class ProRequest {
     private Double discount;
 
     @NotNull(message = "Product quantity is required")
-    @Positive(message = "Please enter valid product quantity")
+    @Positive(message = "Product quantity must be grater than 0")
     private Integer quantity;
 
     private Boolean active = false;
