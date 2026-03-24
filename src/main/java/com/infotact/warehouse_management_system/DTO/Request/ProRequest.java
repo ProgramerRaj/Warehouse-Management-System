@@ -14,13 +14,11 @@ public class ProRequest {
     @NotBlank(message = "Product description is required")
     private String description;
 
-    @NotBlank(message = "Category is required")
+    @NotNull(message = "Category is required")
     private ProductCategory category;
 
-    @Positive(message = "SellingPrice must be greater than 0")
-    private Double sellingPrice;
-
     @Positive(message = "Product MRP must be required")
+    @NotNull(message = "Product MRP must be required")
     private Double mrp;
 
     @Max(value = 99)
@@ -29,6 +27,7 @@ public class ProRequest {
     private Double discount;
 
     @NotNull(message = "Product quantity is required")
+    @Positive(message = "Please enter valid product quantity")
     private Integer quantity;
 
     private Boolean active = false;

@@ -31,3 +31,6 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### hide app.properties file ###
+/src/main/resources/application.properties
