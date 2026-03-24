@@ -1,6 +1,7 @@
 package com.infotact.warehouse_management_system.ExHandler;
 
 import com.infotact.warehouse_management_system.Exception.ProductExistsEx;
+import com.infotact.warehouse_management_system.Exception.ProductNotFoundEx;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -25,5 +26,9 @@ public class GlobalException {
                 forEach(error -> errors.put(error.getField(),error.getDefaultMessage()));
 
         return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
+    }
+    @ExceptionHandler(ProductNotFoundEx.class)
+    public ResponseEntity<String> ProductNotFoundEx(ProductNotFoundEx ex){
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
     }
 }

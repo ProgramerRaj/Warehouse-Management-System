@@ -3,6 +3,7 @@ package com.infotact.warehouse_management_system.Service;
 import com.infotact.warehouse_management_system.DTO.Request.ProRequest;
 import com.infotact.warehouse_management_system.DTO.Response.ProResponse;
 import com.infotact.warehouse_management_system.Exception.ProductExistsEx;
+import com.infotact.warehouse_management_system.Exception.ProductNotFoundEx;
 import com.infotact.warehouse_management_system.Model.Product;
 import com.infotact.warehouse_management_system.Repository.ProductRepo;
 import jakarta.transaction.Transactional;
@@ -60,8 +61,25 @@ public class ProductService {
         return response;
     }
 
+    // get product by id
+    @Transactional
+    public ProResponse getProduct(long id){
+        Product p = productRepo.findById(id).
+                orElseThrow(()-> new ProductNotFoundEx("Product not found with id: "+id));
+
+        // Set product response
+        ProResponse response = new ProResponse(
+                p.getId(), p.getName(),
+                p.getMrp(), p.getDiscount(),
+                p.getSellingPrice(), p.getDescription(),
+                p.getQuantity(), p.getSku(),
+                p.getCategory(), p.isActive()
+        );
+        return response;
+    }
+
     // Local methode
-    public String generateSKU(String proCategory,String proName){
+    private String generateSKU(String proCategory,String proName){
         String catCode = proCategory.substring(0,3).toUpperCase();
         String proCode = proName.substring(0,3).toUpperCase();
 
