@@ -35,6 +35,6 @@ public class GlobalException {
 
     @ExceptionHandler(WarehouseExistsEx.class)
     public ResponseEntity<String> handleWarehouseExistsEx(WarehouseExistsEx ex){
-        return new ResponseEntity<>(ex.getMessage(),HttpStatus.BAD_REQUEST)
+        return new ResponseEntity<>(ex.getMessage(),HttpStatus.BAD_REQUEST);
     }
 }
