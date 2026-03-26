@@ -4,6 +4,8 @@ import com.infotact.warehouse_management_system.Enum.ProductCategory;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.util.List;
+
 @Entity
 @Table(name = "product")
 @Data
@@ -17,6 +19,8 @@ public class Product {
     private double sellingPrice;
 
     private String description;
+
+    @Enumerated(EnumType.STRING)
     private ProductCategory category;
     private boolean active;
     private String name;
@@ -26,4 +30,10 @@ public class Product {
 
     @Column(unique = true)
     private String sku; // --- Stock keeping Unit ----
+
+    @OneToMany(cascade = CascadeType.ALL,mappedBy = "product")
+    private List<Inventory> inventories;
+
+    @OneToMany(mappedBy = "product")
+    private List<OrderItem> orderItems;
 }

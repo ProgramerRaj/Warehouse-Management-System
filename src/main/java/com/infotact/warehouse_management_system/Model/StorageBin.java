@@ -1,0 +1,28 @@
+package com.infotact.warehouse_management_system.Model;
+
+import jakarta.persistence.*;
+import lombok.Data;
+
+import java.util.List;
+
+@Entity
+@Table(name = "storage_bins")
+@Data
+public class StorageBin {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
+
+    @Column(name = "bin_code",unique = true)
+    private String binCode;
+
+    private int capacity;
+
+    @ManyToOne
+    @JoinColumn(name = "aisle_id")
+    private Aisle aisle;
+
+    @OneToMany(cascade = CascadeType.ALL,mappedBy = "bin")
+    private List<Inventory> inventories;
+}
