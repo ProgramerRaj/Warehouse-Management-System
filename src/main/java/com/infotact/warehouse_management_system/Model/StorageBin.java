@@ -17,12 +17,14 @@ public class StorageBin {
     @Column(name = "bin_code",unique = true)
     private String binCode;
 
-    private int capacity;
+    private int maxCapacity;
+
+    private int usedCapacity;
 
     @ManyToOne
     @JoinColumn(name = "aisle_id")
     private Aisle aisle;
 
-    @OneToMany(cascade = CascadeType.ALL,mappedBy = "bin")
+    @OneToMany(cascade = CascadeType.ALL,mappedBy = "bin",fetch = FetchType.LAZY)
     private List<Inventory> inventories;
 }

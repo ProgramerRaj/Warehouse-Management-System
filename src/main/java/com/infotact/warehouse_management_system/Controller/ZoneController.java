@@ -1,8 +1,9 @@
 package com.infotact.warehouse_management_system.Controller;
 
-import com.infotact.warehouse_management_system.DTO.Request.WarehouseAddReq;
-import com.infotact.warehouse_management_system.DTO.Response.WarehouseAddRes;
-import com.infotact.warehouse_management_system.Service.WarehouseService;
+import com.infotact.warehouse_management_system.DTO.Request.ZoneAddReq;
+import com.infotact.warehouse_management_system.DTO.Response.ZoneAddRes;
+import com.infotact.warehouse_management_system.Repository.ZoneRepo;
+import com.infotact.warehouse_management_system.Service.ZoneService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -12,19 +13,18 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+@RequestMapping("/warehouse/zones")
 @RestController
-@RequestMapping("/warehouses")
 @Validated
-public class WarehouseController {
+public class ZoneController {
 
     @Autowired
-    private WarehouseService warehouseService;
+    private ZoneService zoneService;
 
-    @PostMapping("/add-warehouse")
-    public ResponseEntity<WarehouseAddRes> addWarehouse(
-            @RequestBody @Valid WarehouseAddReq req){
-        WarehouseAddRes response = warehouseService.addWarehouse(req);
-
+    @PostMapping("/add-zone")
+    public ResponseEntity<ZoneAddRes> addZone(
+            @RequestBody @Valid ZoneAddReq request){
+        ZoneAddRes response = zoneService.addZone(request);
         return ResponseEntity.ok(response);
     }
 }

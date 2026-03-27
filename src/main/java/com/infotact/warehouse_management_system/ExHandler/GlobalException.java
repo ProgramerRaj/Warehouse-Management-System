@@ -3,6 +3,7 @@ package com.infotact.warehouse_management_system.ExHandler;
 import com.infotact.warehouse_management_system.Exception.ProductExistsEx;
 import com.infotact.warehouse_management_system.Exception.ProductNotFoundEx;
 import com.infotact.warehouse_management_system.Exception.WarehouseExistsEx;
+import com.infotact.warehouse_management_system.Exception.WarehouseNotFoundEx;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -35,6 +36,16 @@ public class GlobalException {
 
     @ExceptionHandler(WarehouseExistsEx.class)
     public ResponseEntity<String> handleWarehouseExistsEx(WarehouseExistsEx ex){
+        return new ResponseEntity<>(ex.getMessage(),HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(WarehouseNotFoundEx.class)
+    public ResponseEntity<String> handleWarehouseNotFoundEx(WarehouseNotFoundEx ex){
+        return new ResponseEntity<>(ex.getMessage(),HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<String> handleRuntimeEx(RuntimeException ex){
         return new ResponseEntity<>(ex.getMessage(),HttpStatus.BAD_REQUEST);
     }
 }

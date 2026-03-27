@@ -13,9 +13,11 @@ public class Warehouse {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+
     private String name;
+
     private String location;
 
-    @OneToMany(cascade = CascadeType.REMOVE,mappedBy = "warehouse")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "warehouse", fetch = FetchType.LAZY)
     private List<Zone> zones;
 }

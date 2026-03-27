@@ -25,7 +25,7 @@ public class Order {
 
     private String pinCode;
 
-    @OneToMany(cascade = CascadeType.ALL,mappedBy = "order")
+    @OneToMany(cascade = CascadeType.ALL,mappedBy = "order",fetch = FetchType.LAZY)
     private List<OrderItem> orderItems;
 
     @Enumerated(EnumType.STRING)

@@ -22,6 +22,6 @@ public class Zone {
     @JoinColumn(name = "warehouse_id")
     private Warehouse warehouse;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "zone")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "zone", fetch = FetchType.LAZY)
     private List<Aisle> aisles;
 }

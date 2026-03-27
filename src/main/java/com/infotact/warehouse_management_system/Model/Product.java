@@ -22,18 +22,21 @@ public class Product {
 
     @Enumerated(EnumType.STRING)
     private ProductCategory category;
+
     private boolean active;
+
     private String name;
+
     private double mrp;
+
     private double discount;
-    private int quantity;
 
     @Column(unique = true)
     private String sku; // --- Stock keeping Unit ----
 
-    @OneToMany(cascade = CascadeType.ALL,mappedBy = "product")
+    @OneToMany(cascade = CascadeType.ALL,mappedBy = "product",fetch = FetchType.LAZY)
     private List<Inventory> inventories;
 
-    @OneToMany(mappedBy = "product")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "product", fetch = FetchType.LAZY)
     private List<OrderItem> orderItems;
 }

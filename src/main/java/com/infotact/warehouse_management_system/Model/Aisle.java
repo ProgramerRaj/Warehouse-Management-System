@@ -20,6 +20,6 @@ public class Aisle {
     @JoinColumn(name = "zone_id")
     private Zone zone;
 
-    @OneToMany(cascade = CascadeType.ALL,mappedBy = "aisle")
+    @OneToMany(cascade = CascadeType.ALL,mappedBy = "aisle",fetch = FetchType.LAZY)
     private List<StorageBin> bins;
 }

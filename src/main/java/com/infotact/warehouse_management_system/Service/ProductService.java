@@ -41,7 +41,6 @@ public class ProductService {
         product.setDiscount(request.getDiscount());
         product.setDescription(request.getDescription());
         product.setSku(sku);
-        product.setQuantity(request.getQuantity());
 
         // Calculate selling price
         double discRate = (request.getMrp() * request.getDiscount()) / 100;
@@ -54,8 +53,7 @@ public class ProductService {
         ProResponse response = new ProResponse(
                 savedProduct.getId(), savedProduct.getName(),
                 savedProduct.getMrp(), savedProduct.getDiscount(),
-                savedProduct.getSellingPrice(), savedProduct.getDescription(),
-                savedProduct.getQuantity(), savedProduct.getSku(),
+                savedProduct.getSellingPrice(), savedProduct.getDescription() ,savedProduct.getSku(),
                 savedProduct.getCategory(), savedProduct.isActive()
         );
         return response;
@@ -72,7 +70,7 @@ public class ProductService {
                 p.getId(), p.getName(),
                 p.getMrp(), p.getDiscount(),
                 p.getSellingPrice(), p.getDescription(),
-                p.getQuantity(), p.getSku(),
+                p.getSku(),
                 p.getCategory(), p.isActive()
         );
         return response;

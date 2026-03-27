@@ -6,4 +6,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface AisleRepo extends JpaRepository<Aisle,Long> {
+
+    boolean existsByNameAndZoneId(String name, long zoneId);
 }
