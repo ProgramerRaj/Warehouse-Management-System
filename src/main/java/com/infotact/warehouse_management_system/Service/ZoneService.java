@@ -42,8 +42,12 @@ public class ZoneService {
         zone.setName(req.getName());
         zone.setType(req.getType());
         zone.setWarehouse(warehouse);
+        warehouse.getZones().add(zone);
         zone = zoneRepo.save(zone);
 
-        return new ZoneAddRes(zone.getId(), zone.getName(), zone.getType(), zone.getWarehouse().getId());
+        return new ZoneAddRes(zone.getId(),
+                zone.getName(),
+                zone.getType(),
+                zone.getWarehouse().getId());
     }
 }

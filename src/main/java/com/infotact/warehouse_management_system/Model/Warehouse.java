@@ -1,8 +1,10 @@
 package com.infotact.warehouse_management_system.Model;
 
+import com.infotact.warehouse_management_system.Enum.WarehouseLocation;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -16,8 +18,9 @@ public class Warehouse {
 
     private String name;
 
-    private String location;
+    @Enumerated(EnumType.STRING)
+    private WarehouseLocation location;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "warehouse", fetch = FetchType.LAZY)
-    private List<Zone> zones;
+    private List<Zone> zones = new ArrayList<>();
 }

@@ -1,8 +1,10 @@
 package com.infotact.warehouse_management_system.Model;
 
+import com.infotact.warehouse_management_system.Enum.AisleName;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -14,12 +16,13 @@ public class Aisle {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    private String name;
+    @Enumerated(EnumType.STRING)
+    private AisleName name;
 
     @ManyToOne
     @JoinColumn(name = "zone_id")
     private Zone zone;
 
     @OneToMany(cascade = CascadeType.ALL,mappedBy = "aisle",fetch = FetchType.LAZY)
-    private List<StorageBin> bins;
+    private List<StorageBin> bins = new ArrayList<>();
 }

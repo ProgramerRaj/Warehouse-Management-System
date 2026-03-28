@@ -1,5 +1,7 @@
 package com.infotact.warehouse_management_system.DTO.Response;
 
+import com.infotact.warehouse_management_system.Enum.ZoneName;
+import com.infotact.warehouse_management_system.Enum.ZoneType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -8,7 +10,7 @@ import lombok.Data;
 public class ZoneAddRes {
 
     private long zoneId;
-    private String zoneName;
-    private String zoneType;
+    private ZoneName zoneName;
+    private ZoneType zoneType;
     private long warehouseId;
 }

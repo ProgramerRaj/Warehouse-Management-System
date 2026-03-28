@@ -1,14 +1,15 @@
 package com.infotact.warehouse_management_system.DTO.Response;
 
-import com.infotact.warehouse_management_system.Enum.AisleName;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class AisleAddRes {
+public class BinAddRes {
 
+    private long binId;
+    private String binCode;
+    private int maxCapacity;
+    private int usedCapacity;
     private long aisleId;
-    private AisleName aisleName;
-    private long zoneId;
 }

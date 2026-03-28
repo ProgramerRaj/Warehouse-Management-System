@@ -4,6 +4,7 @@ import com.infotact.warehouse_management_system.Enum.ProductCategory;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -35,8 +36,8 @@ public class Product {
     private String sku; // --- Stock keeping Unit ----
 
     @OneToMany(cascade = CascadeType.ALL,mappedBy = "product",fetch = FetchType.LAZY)
-    private List<Inventory> inventories;
+    private List<Inventory> inventories = new ArrayList<>();
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "product", fetch = FetchType.LAZY)
-    private List<OrderItem> orderItems;
+    private List<OrderItem> orderItems = new ArrayList<>();
 }

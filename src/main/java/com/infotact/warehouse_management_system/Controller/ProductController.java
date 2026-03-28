@@ -1,6 +1,6 @@
 package com.infotact.warehouse_management_system.Controller;
 
-import com.infotact.warehouse_management_system.DTO.Request.ProRequest;
+import com.infotact.warehouse_management_system.DTO.Request.ProductAddReq;
 import com.infotact.warehouse_management_system.DTO.Response.ProResponse;
 import com.infotact.warehouse_management_system.Service.ProductService;
 import jakarta.validation.Valid;
@@ -10,7 +10,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("products")
+@RequestMapping("/products")
 @Validated
 public class ProductController {
 
@@ -18,9 +18,9 @@ public class ProductController {
     ProductService productService;
 
     // Add product
-    @PostMapping("/add")
+    @PostMapping("/add-product")
     public ResponseEntity<ProResponse> addProduct(
-            @RequestBody @Valid ProRequest request
+            @RequestBody @Valid ProductAddReq request
     ) {
         return ResponseEntity.ok(productService.addProduct(request));
     }

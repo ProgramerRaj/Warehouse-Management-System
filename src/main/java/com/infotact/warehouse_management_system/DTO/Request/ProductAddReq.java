@@ -6,7 +6,7 @@ import jakarta.validation.constraints.*;
 import lombok.Data;
 
 @Data
-public class ProRequest {
+public class ProductAddReq {
 
     @NotBlank(message = "Product name is required")
     private String name;
@@ -30,5 +30,5 @@ public class ProRequest {
     @Positive(message = "Product quantity must be grater than 0")
     private Integer quantity;
 
-    private Boolean active = false;
+    private Boolean active = true;
 }

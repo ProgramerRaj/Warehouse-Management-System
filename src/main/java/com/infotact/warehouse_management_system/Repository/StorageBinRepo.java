@@ -6,4 +6,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface StorageBinRepo extends JpaRepository<StorageBin,Long> {
+
+    boolean existsByBinCode(String binCode);
 }

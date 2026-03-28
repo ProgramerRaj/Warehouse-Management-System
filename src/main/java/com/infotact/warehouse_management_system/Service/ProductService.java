@@ -1,6 +1,6 @@
 package com.infotact.warehouse_management_system.Service;
 
-import com.infotact.warehouse_management_system.DTO.Request.ProRequest;
+import com.infotact.warehouse_management_system.DTO.Request.ProductAddReq;
 import com.infotact.warehouse_management_system.DTO.Response.ProResponse;
 import com.infotact.warehouse_management_system.Exception.ProductExistsEx;
 import com.infotact.warehouse_management_system.Exception.ProductNotFoundEx;
@@ -18,7 +18,7 @@ public class ProductService {
 
     // add product
     @Transactional
-    public ProResponse addProduct(ProRequest request){
+    public ProResponse addProduct(ProductAddReq request){
 
         // Product already exists with name
         if(productRepo.existsByNameAndCategory(request.getName(),request.getCategory())){
