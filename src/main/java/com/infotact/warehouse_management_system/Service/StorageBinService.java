@@ -40,7 +40,6 @@ public class StorageBinService {
         bin.setMaxCapacity(req.getMaxCapacity());
         bin.setUsedCapacity(0);
         bin.setAisle(aisle);
-        aisle.getBins().add(bin);
 
         bin = storageBinRepo.save(bin);
 

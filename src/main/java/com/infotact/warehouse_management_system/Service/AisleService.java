@@ -11,7 +11,6 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 
 @Service
 public class AisleService {
@@ -25,11 +24,9 @@ public class AisleService {
     @Transactional
     public AisleAddRes addAisle(AisleAddReq req){
 
-        // Check zone exists or not
         Zone zone = zoneRepo.findById(req.getZoneId()).
                 orElseThrow(()->new ZoneNotFoundEx("Zone not found with id: "+req.getZoneId()));
 
-        // If exists aisle name in same zone
         if(aisleRepo.existsByNameAndZoneId(req.getName(), req.getZoneId())){
                 throw new RuntimeException(req.getName()+ "aisle already exists in zone "+zone.getName());
         }
@@ -37,8 +34,6 @@ public class AisleService {
         Aisle aisle = new Aisle();
         aisle.setName(req.getName());
         aisle.setZone(zone);
-        zone.getAisles().add(aisle);
-
         aisle = aisleRepo.save(aisle);
 
         return new AisleAddRes(aisle.getId(),
