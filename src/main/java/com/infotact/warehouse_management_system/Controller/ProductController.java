@@ -20,9 +20,10 @@ public class ProductController {
     // Add product
     @PostMapping("/add-product")
     public ResponseEntity<ProResponse> addProduct(
+            @RequestParam(required = true) long warehouseId,
             @RequestBody @Valid ProductAddReq request
     ) {
-        return ResponseEntity.ok(productService.addProduct(request));
+        return ResponseEntity.ok(productService.addProduct(warehouseId, request));
     }
 
     // Get product by id

@@ -18,4 +18,6 @@ public interface ZoneRepo extends JpaRepository<Zone,Long> {
 
     // Check zone name already exists or not in existing warehouse
     boolean existsByNameAndWarehouseId(ZoneName name, long warehouseId);
+
+    Zone findByTypeAndWarehouseId(ZoneType zoneType, long warehouseId);
 }

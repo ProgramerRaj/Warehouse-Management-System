@@ -21,4 +21,5 @@ public class Inventory {
     private StorageBin bin;
 
     private int quantity;
+    
 }

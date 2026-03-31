@@ -15,9 +15,10 @@ public class ProResponse {
     private String sku;
     private ProductCategory category;
     private boolean active;
+    private long warehouseId;
 
     // Parameterise constructor
-    public ProResponse(long productId, String proName, double mrp, double discount, double sellingPrice, String description, String sku, ProductCategory category, boolean active) {
+    public ProResponse(long productId, String proName, double mrp, double discount, double sellingPrice, String description, String sku, ProductCategory category, boolean active, long warehouseId) {
         this.productId = productId;
         this.proName = proName;
         this.mrp = mrp;
@@ -27,5 +28,6 @@ public class ProResponse {
         this.sku = sku;
         this.category = category;
         this.active = active;
+        this.warehouseId = warehouseId;
     }
 }

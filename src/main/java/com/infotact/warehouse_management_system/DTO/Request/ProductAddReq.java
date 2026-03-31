@@ -3,9 +3,11 @@ package com.infotact.warehouse_management_system.DTO.Request;
 
 import com.infotact.warehouse_management_system.Enum.ProductCategory;
 import jakarta.validation.constraints.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
+@AllArgsConstructor
 public class ProductAddReq {
 
     @NotBlank(message = "Product name is required")
