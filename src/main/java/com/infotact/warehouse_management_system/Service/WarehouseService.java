@@ -2,6 +2,7 @@ package com.infotact.warehouse_management_system.Service;
 
 import com.infotact.warehouse_management_system.DTO.Request.WarehouseAddReq;
 import com.infotact.warehouse_management_system.DTO.Response.WarehouseAddRes;
+import com.infotact.warehouse_management_system.DTO.Response.WarehouseGetByIdRes;
 import com.infotact.warehouse_management_system.DTO.Response.WarehouseGetRes;
 import com.infotact.warehouse_management_system.DTO.Response.WarehouseInfo;
 import com.infotact.warehouse_management_system.DTO.Wrapper.AisleRes;
@@ -121,5 +122,34 @@ public class WarehouseService {
 
         // response
         return new WarehouseGetRes(warehouseResList.size(),warehouseResList);
+    }
+    @Transactional
+    public WarehouseGetByIdRes getWarehouseById(long id){
+
+        Warehouse warehouse = warehouseRepo.findById(id).
+                orElseThrow(()->new WarehouseNotFoundEx("Warehouse not found with id: "+id));
+
+        int totalZones = 0;
+        int totalAisles = 0;
+        int totalBins = 0;
+
+        for(Zone zone : warehouse.getZones()){
+            totalAisles += zone.getAisles().size();
+
+            for(Aisle aisle : zone.getAisles()){
+                totalBins += aisle.getBins().size();
+            }
+        }
+        totalZones = warehouse.getZones().size();
+
+        WarehouseGetByIdRes response = new WarehouseGetByIdRes();
+        response.setId(warehouse.getId());
+        response.setName(warehouse.getName());
+        response.setLocation(warehouse.getLocation());
+        response.setTotalZones(totalZones);
+        response.setTotalAisles(totalAisles);
+        response.setTotalBins(totalBins);
+
+        return response;
     }
 }

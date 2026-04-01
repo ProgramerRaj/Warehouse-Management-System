@@ -2,6 +2,7 @@ package com.infotact.warehouse_management_system.Controller;
 
 import com.infotact.warehouse_management_system.DTO.Request.WarehouseAddReq;
 import com.infotact.warehouse_management_system.DTO.Response.WarehouseAddRes;
+import com.infotact.warehouse_management_system.DTO.Response.WarehouseGetByIdRes;
 import com.infotact.warehouse_management_system.DTO.Response.WarehouseGetRes;
 import com.infotact.warehouse_management_system.DTO.Response.WarehouseInfo;
 import com.infotact.warehouse_management_system.Service.WarehouseService;
@@ -36,5 +37,12 @@ public class WarehouseController {
     public ResponseEntity<?> getAllWarehouse(){
         WarehouseGetRes res = warehouseService.getAllWarehouse();
         return ResponseEntity.ok(res);
+    }
+
+    @GetMapping("/get/warehouse/by-id/{id}")
+    public ResponseEntity<?> getWarehouseById(@PathVariable Long id){
+
+        WarehouseGetByIdRes res = warehouseService.getWarehouseById(id);
+            return ResponseEntity.ok(res);
     }
 }
