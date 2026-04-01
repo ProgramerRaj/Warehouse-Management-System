@@ -1,10 +1,8 @@
 package com.infotact.warehouse_management_system.Service;
 
+import com.infotact.warehouse_management_system.DTO.Request.UpdateWarehouseReq;
 import com.infotact.warehouse_management_system.DTO.Request.WarehouseAddReq;
-import com.infotact.warehouse_management_system.DTO.Response.WarehouseAddRes;
-import com.infotact.warehouse_management_system.DTO.Response.WarehouseGetByIdRes;
-import com.infotact.warehouse_management_system.DTO.Response.WarehouseGetRes;
-import com.infotact.warehouse_management_system.DTO.Response.WarehouseInfo;
+import com.infotact.warehouse_management_system.DTO.Response.*;
 import com.infotact.warehouse_management_system.DTO.Wrapper.AisleRes;
 import com.infotact.warehouse_management_system.DTO.Wrapper.BinRes;
 import com.infotact.warehouse_management_system.DTO.Wrapper.WarehouseRes;
@@ -41,12 +39,14 @@ public class WarehouseService {
         Warehouse warehouse = new Warehouse();
         warehouse.setName(req.getName());
         warehouse.setLocation(req.getLocation());
+        warehouse.setActive(true);
 
         warehouse = warehouseRepo.save(warehouse);
 
         WarehouseAddRes response = new WarehouseAddRes(warehouse.getId(),
                 warehouse.getName(),
-                warehouse.getLocation());
+                warehouse.getLocation(),
+                warehouse.isActive());
         return response;
     }
 
@@ -83,7 +83,9 @@ public class WarehouseService {
         }
         WarehouseInfo warehouseInfo = new WarehouseInfo(
                 warehouse.getId(), warehouse.getName(),
-                warehouse.getLocation(), zoneList);
+                warehouse.getLocation(),
+                warehouse.isActive(),
+                zoneList);
 
         return warehouseInfo;
     }
@@ -103,7 +105,7 @@ public class WarehouseService {
             warehouseRes.setId(w.getId());
             warehouseRes.setName(w.getName());
             warehouseRes.setLocation(w.getLocation());
-            warehouseRes.setTotalZones(w.getZones().size());
+            warehouseRes.setActive(w.isActive());
 
             int totalAisles = 0;
             int totalBins = 0;
@@ -114,6 +116,7 @@ public class WarehouseService {
                     totalBins += a.getBins().size();
                 }
             }
+            warehouseRes.setTotalZones(w.getZones().size());
             warehouseRes.setTotalAisles(totalAisles);
             warehouseRes.setTotalBins(totalBins);
 
@@ -146,9 +149,49 @@ public class WarehouseService {
         response.setId(warehouse.getId());
         response.setName(warehouse.getName());
         response.setLocation(warehouse.getLocation());
+        response.setActive(warehouse.isActive());
         response.setTotalZones(totalZones);
         response.setTotalAisles(totalAisles);
         response.setTotalBins(totalBins);
+
+        return response;
+    }
+    @Transactional
+    public WarehouseAddRes updateWarehouse(long warehouseId, UpdateWarehouseReq req){
+
+        Warehouse warehouse = warehouseRepo.findById(warehouseId)
+                .orElseThrow(()-> new WarehouseNotFoundEx("Warehouse not found with id: "+warehouseId));
+
+        if(!warehouse.isActive()){
+            throw new RuntimeException("Warehouse already deleted with id: "+warehouseId +"\nSo you can't update in it");
+        }
+
+        // update fields
+        warehouse.setName(req.getName());
+        warehouse.setLocation(req.getLocation());
+        warehouseRepo.save(warehouse);
+
+        // response
+        return new WarehouseAddRes(warehouse.getId(),
+                warehouse.getName(), warehouse.getLocation(), warehouse.isActive());
+    }
+
+    @Transactional
+    public WarehouseDeletedRes deleteWarehouseById(long id){
+        Warehouse warehouse = warehouseRepo.findById(id).
+                orElseThrow(()-> new WarehouseNotFoundEx("Warehouse not found with id: "+id));
+        if(!warehouse.isActive()){
+            throw new RuntimeException("This warehouse already deleted");
+        }
+        warehouse.setActive(false);
+        warehouseRepo.save(warehouse);
+
+        WarehouseDeletedRes response = new WarehouseDeletedRes();
+        response.setId(warehouse.getId());
+        response.setName(warehouse.getName());
+        response.setLocation(warehouse.getLocation());
+        response.setActive(warehouse.isActive());
+        response.setMessage("Warehouse deleted successfully with id: " + id);
 
         return response;
     }

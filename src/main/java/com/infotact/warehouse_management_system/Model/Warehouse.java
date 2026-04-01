@@ -24,6 +24,8 @@ public class Warehouse {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "warehouse", fetch = FetchType.LAZY)
     private List<Zone> zones = new ArrayList<>();
 
-    @OneToMany(mappedBy = "warehouse", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "warehouse", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     private List<Product> products;
+
+    private boolean active;
 }

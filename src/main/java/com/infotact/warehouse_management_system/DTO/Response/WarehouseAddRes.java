@@ -11,4 +11,5 @@ public class WarehouseAddRes {
     private long warehouseId;
     private String warehouseName;
     private WarehouseLocation location;
+    private boolean active;
 }

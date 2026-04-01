@@ -1,10 +1,8 @@
 package com.infotact.warehouse_management_system.Controller;
 
+import com.infotact.warehouse_management_system.DTO.Request.UpdateWarehouseReq;
 import com.infotact.warehouse_management_system.DTO.Request.WarehouseAddReq;
-import com.infotact.warehouse_management_system.DTO.Response.WarehouseAddRes;
-import com.infotact.warehouse_management_system.DTO.Response.WarehouseGetByIdRes;
-import com.infotact.warehouse_management_system.DTO.Response.WarehouseGetRes;
-import com.infotact.warehouse_management_system.DTO.Response.WarehouseInfo;
+import com.infotact.warehouse_management_system.DTO.Response.*;
 import com.infotact.warehouse_management_system.Service.WarehouseService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,5 +42,18 @@ public class WarehouseController {
 
         WarehouseGetByIdRes res = warehouseService.getWarehouseById(id);
             return ResponseEntity.ok(res);
+    }
+    @PutMapping("/update/warehouse/by-id/{id}")
+    public ResponseEntity<?> updateWarehouse(
+            @PathVariable Long id,
+            @RequestBody @Valid UpdateWarehouseReq req){
+
+        WarehouseAddRes res = warehouseService.updateWarehouse(id,req);
+        return ResponseEntity.ok(res);
+    }
+    @DeleteMapping("/delete/warehouse/by-id/{id}")
+    public ResponseEntity<?> deleteWarehouseById(Long id){
+        WarehouseDeletedRes res = warehouseService.deleteWarehouseById(id);
+        return ResponseEntity.ok(res);
     }
 }
