@@ -2,9 +2,11 @@ package com.infotact.warehouse_management_system.Service;
 
 import com.infotact.warehouse_management_system.DTO.Request.WarehouseAddReq;
 import com.infotact.warehouse_management_system.DTO.Response.WarehouseAddRes;
+import com.infotact.warehouse_management_system.DTO.Response.WarehouseGetRes;
 import com.infotact.warehouse_management_system.DTO.Response.WarehouseInfo;
 import com.infotact.warehouse_management_system.DTO.Wrapper.AisleRes;
 import com.infotact.warehouse_management_system.DTO.Wrapper.BinRes;
+import com.infotact.warehouse_management_system.DTO.Wrapper.WarehouseRes;
 import com.infotact.warehouse_management_system.DTO.Wrapper.ZoneRes;
 import com.infotact.warehouse_management_system.Exception.WarehouseExistsEx;
 import com.infotact.warehouse_management_system.Exception.WarehouseNotFoundEx;
@@ -83,5 +85,41 @@ public class WarehouseService {
                 warehouse.getLocation(), zoneList);
 
         return warehouseInfo;
+    }
+
+    @Transactional
+    public WarehouseGetRes getAllWarehouse(){
+
+        // get all warehouse
+        List<Warehouse> warehouses = warehouseRepo.findAll();
+        if(warehouses.isEmpty()){
+            throw new WarehouseNotFoundEx("No any warehouse found");
+        }
+
+        List<WarehouseRes> warehouseResList = new ArrayList<>();
+        for(Warehouse w : warehouses){
+            WarehouseRes warehouseRes = new WarehouseRes();
+            warehouseRes.setId(w.getId());
+            warehouseRes.setName(w.getName());
+            warehouseRes.setLocation(w.getLocation());
+            warehouseRes.setTotalZones(w.getZones().size());
+
+            int totalAisles = 0;
+            int totalBins = 0;
+            for(Zone z : w.getZones()){
+                totalAisles += z.getAisles().size();
+
+                for(Aisle a : z.getAisles()){
+                    totalBins += a.getBins().size();
+                }
+            }
+            warehouseRes.setTotalAisles(totalAisles);
+            warehouseRes.setTotalBins(totalBins);
+
+            warehouseResList.add(warehouseRes);
+        }
+
+        // response
+        return new WarehouseGetRes(warehouseResList.size(),warehouseResList);
     }
 }

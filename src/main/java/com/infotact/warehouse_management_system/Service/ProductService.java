@@ -103,8 +103,9 @@ public class ProductService {
             StorageBin bin = inv.getBin();
             Long binWarehouseId = bin.getAisle().getZone().getWarehouse().getId();
 
-            if (!binWarehouseId.equals(warehouseId)) continue;
-
+            if (!binWarehouseId.equals(warehouseId)) {
+                continue;
+            }
             int availableSpace = bin.getMaxCapacity() - bin.getUsedCapacity();
 
             if (availableSpace >= request.getQuantity()) {
