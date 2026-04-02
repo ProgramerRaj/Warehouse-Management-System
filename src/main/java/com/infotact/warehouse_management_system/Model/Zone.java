@@ -23,6 +23,8 @@ public class Zone {
     @Enumerated(EnumType.STRING)
     private ZoneType type;
 
+    private boolean active;
+
     @ManyToOne
     @JoinColumn(name = "warehouse_id")
     private Warehouse warehouse;
