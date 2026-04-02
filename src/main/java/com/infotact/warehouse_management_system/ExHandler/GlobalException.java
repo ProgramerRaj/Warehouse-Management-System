@@ -55,4 +55,8 @@ public class GlobalException {
     public ResponseEntity<String> handleRuntimeEx(RuntimeException ex){
         return new ResponseEntity<>(ex.getMessage(),HttpStatus.BAD_REQUEST);
     }
+    @ExceptionHandler(BinNotFoundEx.class)
+    public ResponseEntity<String> handleBinNotFoundEx(BinNotFoundEx ex){
+        return new ResponseEntity<>(ex.getMessage(),HttpStatus.BAD_REQUEST);
+    }
 }
