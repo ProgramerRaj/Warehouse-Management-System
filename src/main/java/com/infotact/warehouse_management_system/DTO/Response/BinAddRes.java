@@ -11,5 +11,6 @@ public class BinAddRes {
     private String binCode;
     private int maxCapacity;
     private int usedCapacity;
+    private boolean active;
     private long aisleId;
 }
