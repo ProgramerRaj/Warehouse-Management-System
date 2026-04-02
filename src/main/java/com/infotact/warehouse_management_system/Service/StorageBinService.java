@@ -1,10 +1,13 @@
 package com.infotact.warehouse_management_system.Service;
 
 import com.infotact.warehouse_management_system.DTO.Request.BinAddReq;
+import com.infotact.warehouse_management_system.DTO.Request.BinUpdateReq;
 import com.infotact.warehouse_management_system.DTO.Response.BinAddRes;
+import com.infotact.warehouse_management_system.DTO.Response.BinDelRes;
 import com.infotact.warehouse_management_system.Enum.BinCode;
 import com.infotact.warehouse_management_system.Exception.AisleNotFoundEx;
 import com.infotact.warehouse_management_system.Exception.BinExistsEx;
+import com.infotact.warehouse_management_system.Exception.BinNotFoundEx;
 import com.infotact.warehouse_management_system.Model.Aisle;
 import com.infotact.warehouse_management_system.Model.StorageBin;
 import com.infotact.warehouse_management_system.Model.Zone;
@@ -39,12 +42,14 @@ public class StorageBinService {
         bin.setBinCode(binCode);
         bin.setMaxCapacity(req.getMaxCapacity());
         bin.setUsedCapacity(0);
+        bin.setActive(true);
         bin.setAisle(aisle);
 
         bin = storageBinRepo.save(bin);
 
         return new BinAddRes(bin.getId(), bin.getBinCode(),
                 bin.getMaxCapacity(),bin.getUsedCapacity(),
+                bin.isActive(),
                 bin.getAisle().getId());
     }
     // Local methode
@@ -55,5 +60,68 @@ public class StorageBinService {
         // Ex: ZA-A1-B1
         String merge = zone.getName().toString() + "-" + aisle.getName().toString() + "-" + binCode.toString();
         return merge;
+    }
+
+    @Transactional
+    public BinAddRes updateBinById(long id, BinUpdateReq req){
+        StorageBin bin = storageBinRepo.findByIdAndAisleId(id,req.getAisleId())
+                .orElseThrow(()-> new BinNotFoundEx("This bin not found with id: "+id+" in this aisle with id: "+req.getAisleId()));
+
+        if(!bin.isActive()){
+            throw new RuntimeException("This bin already deleted with id: "+id+"\nSo you can't update it now");
+        }
+
+        // if new maxCapacity less than old usedCapacity
+        if(req.getMaxCapacity() < bin.getUsedCapacity()){
+            throw new RuntimeException("New maxCapacity is less than existing bin used capacity\nSo that you can't update it now, Because new maxCapacity of request is less than usedCapacity of existing bin with id: "+id);
+        }
+
+        bin.setMaxCapacity(req.getMaxCapacity());
+        storageBinRepo.save(bin);
+
+        //response
+        return new BinAddRes(
+                bin.getId(),
+                bin.getBinCode(),
+                bin.getMaxCapacity(),
+                bin.getUsedCapacity(),
+                bin.isActive(),
+                bin.getAisle().getId());
+    }
+    @Transactional
+    public BinDelRes deleteBinById(long id){
+        StorageBin bin = storageBinRepo.findById(id)
+                .orElseThrow(()->new RuntimeException("Bin not found with id: "+id));
+
+        if(!bin.isActive()){
+            throw new RuntimeException("This bin already deleted with id: "+id);
+        }
+        bin.setActive(false);
+        storageBinRepo.save(bin);
+
+        //response
+        return new BinDelRes(
+                bin.getId(),
+                bin.getBinCode(),
+                bin.getMaxCapacity(),
+                bin.getUsedCapacity(),
+                bin.isActive(),
+                bin.getAisle().getId()
+        );
+    }
+    @Transactional
+    public BinAddRes getBinById(long id){
+        StorageBin bin = storageBinRepo.findById(id)
+                .orElseThrow(()->new RuntimeException("Bin not found with id: "+id));
+
+        //response
+        return new BinAddRes(
+                bin.getId(),
+                bin.getBinCode(),
+                bin.getMaxCapacity(),
+                bin.getUsedCapacity(),
+                bin.isActive(),
+                bin.getAisle().getId()
+        );
     }
 }

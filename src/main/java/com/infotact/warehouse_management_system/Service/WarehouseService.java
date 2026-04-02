@@ -65,21 +65,28 @@ public class WarehouseService {
                 List<BinRes> binList = new ArrayList<>();
                 for(StorageBin bin : aisle.getBins()){
 
-                    BinRes binRes = new BinRes(bin.getId(),
-                            bin.getBinCode(), bin.getMaxCapacity(),
-                            bin.getUsedCapacity());
+                    BinRes binRes = new BinRes(
+                            bin.getId(),
+                            bin.getBinCode(),
+                            bin.getMaxCapacity(),
+                            bin.getUsedCapacity(),
+                            bin.isActive());
 
                     binList.add(binRes);
                 }
                 AisleRes aisleRes = new AisleRes(
-                        aisle.getId(), aisle.getName(),
+                        aisle.getId(),
+                        aisle.getName(),
                         aisle.isActive(),
                         binList);
                 aisleList.add(aisleRes);
             }
             ZoneRes zoneRes = new ZoneRes(
-                    zone.getId(), zone.getName(),
-                    zone.getType(), zone.isActive(), aisleList);
+                    zone.getId(),
+                    zone.getName(),
+                    zone.getType(),
+                    zone.isActive(),
+                    aisleList);
             zoneList.add(zoneRes);
         }
         WarehouseInfo warehouseInfo = new WarehouseInfo(
