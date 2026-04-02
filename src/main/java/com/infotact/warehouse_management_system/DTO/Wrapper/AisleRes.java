@@ -14,5 +14,6 @@ public class AisleRes {
 
     private long id;
     private AisleName name;
+    private boolean active;
     private List<BinRes> bins;
 }

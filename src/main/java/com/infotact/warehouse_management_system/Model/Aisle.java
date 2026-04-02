@@ -18,6 +18,8 @@ public class Aisle {
 
     @Enumerated(EnumType.STRING)
     private AisleName name;
+    
+    private boolean active;
 
     @ManyToOne
     @JoinColumn(name = "zone_id")

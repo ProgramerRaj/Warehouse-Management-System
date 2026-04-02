@@ -73,6 +73,7 @@ public class WarehouseService {
                 }
                 AisleRes aisleRes = new AisleRes(
                         aisle.getId(), aisle.getName(),
+                        aisle.isActive(),
                         binList);
                 aisleList.add(aisleRes);
             }
@@ -175,7 +176,6 @@ public class WarehouseService {
         return new WarehouseAddRes(warehouse.getId(),
                 warehouse.getName(), warehouse.getLocation(), warehouse.isActive());
     }
-
     @Transactional
     public WarehouseDeletedRes deleteWarehouseById(long id){
         Warehouse warehouse = warehouseRepo.findById(id).

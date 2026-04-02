@@ -33,11 +33,13 @@ public class AisleService {
 
         Aisle aisle = new Aisle();
         aisle.setName(req.getName());
+        aisle.setActive(true);
         aisle.setZone(zone);
         aisle = aisleRepo.save(aisle);
 
         return new AisleAddRes(aisle.getId(),
                 aisle.getName(),
+                aisle.isActive(),
                 aisle.getZone().getId());
     }
 }

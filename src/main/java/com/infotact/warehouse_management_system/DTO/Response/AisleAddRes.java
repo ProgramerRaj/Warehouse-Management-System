@@ -10,5 +10,6 @@ public class AisleAddRes {
 
     private long aisleId;
     private AisleName aisleName;
+    private boolean active;
     private long zoneId;
 }
