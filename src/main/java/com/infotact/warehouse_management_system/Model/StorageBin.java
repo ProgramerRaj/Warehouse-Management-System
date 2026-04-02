@@ -23,6 +23,8 @@ public class StorageBin {
 
     private int usedCapacity;
 
+    private boolean active;
+
     @ManyToOne
     @JoinColumn(name = "aisle_id")
     private Aisle aisle;
