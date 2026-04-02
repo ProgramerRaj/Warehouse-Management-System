@@ -12,5 +12,6 @@ public class ZoneAddRes {
     private long zoneId;
     private ZoneName zoneName;
     private ZoneType zoneType;
+    private boolean active;
     private long warehouseId;
 }

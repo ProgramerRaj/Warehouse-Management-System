@@ -16,5 +16,6 @@ public class ZoneRes {
     private long id;
     private ZoneName name;
     private ZoneType type;
+    private boolean active;
     private List<AisleRes> aisles;
 }

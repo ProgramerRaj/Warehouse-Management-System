@@ -78,7 +78,7 @@ public class WarehouseService {
             }
             ZoneRes zoneRes = new ZoneRes(
                     zone.getId(), zone.getName(),
-                    zone.getType(),aisleList);
+                    zone.getType(), zone.isActive(), aisleList);
             zoneList.add(zoneRes);
         }
         WarehouseInfo warehouseInfo = new WarehouseInfo(

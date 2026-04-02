@@ -10,6 +10,8 @@ import jakarta.validation.constraints.Positive;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface ZoneRepo extends JpaRepository<Zone,Long> {
 
@@ -20,4 +22,6 @@ public interface ZoneRepo extends JpaRepository<Zone,Long> {
     boolean existsByNameAndWarehouseId(ZoneName name, long warehouseId);
 
     Zone findByTypeAndWarehouseId(ZoneType zoneType, long warehouseId);
+
+    Optional<Zone> findByIdAndWarehouseId(long id, long warehouseId);
 }
