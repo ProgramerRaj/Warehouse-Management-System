@@ -1,6 +1,6 @@
 package com.infotact.warehouse_management_system.Service;
 
-import com.infotact.warehouse_management_system.DTO.Request.UpdateWarehouseReq;
+import com.infotact.warehouse_management_system.DTO.Request.WarehouseUpdateReq;
 import com.infotact.warehouse_management_system.DTO.Request.WarehouseAddReq;
 import com.infotact.warehouse_management_system.DTO.Response.*;
 import com.infotact.warehouse_management_system.DTO.Wrapper.AisleRes;
@@ -165,7 +165,7 @@ public class WarehouseService {
         return response;
     }
     @Transactional
-    public WarehouseAddRes updateWarehouse(long warehouseId, UpdateWarehouseReq req){
+    public WarehouseAddRes updateWarehouse(long warehouseId, WarehouseUpdateReq req){
 
         Warehouse warehouse = warehouseRepo.findById(warehouseId)
                 .orElseThrow(()-> new WarehouseNotFoundEx("Warehouse not found with id: "+warehouseId));

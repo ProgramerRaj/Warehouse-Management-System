@@ -1,6 +1,6 @@
 package com.infotact.warehouse_management_system.Controller;
 
-import com.infotact.warehouse_management_system.DTO.Request.UpdateWarehouseReq;
+import com.infotact.warehouse_management_system.DTO.Request.WarehouseUpdateReq;
 import com.infotact.warehouse_management_system.DTO.Request.WarehouseAddReq;
 import com.infotact.warehouse_management_system.DTO.Response.*;
 import com.infotact.warehouse_management_system.Service.WarehouseService;
@@ -46,7 +46,7 @@ public class WarehouseController {
     @PutMapping("/update/warehouse/by-id/{id}")
     public ResponseEntity<?> updateWarehouse(
             @PathVariable Long id,
-            @RequestBody @Valid UpdateWarehouseReq req){
+            @RequestBody @Valid WarehouseUpdateReq req){
 
         WarehouseAddRes res = warehouseService.updateWarehouse(id,req);
         return ResponseEntity.ok(res);
