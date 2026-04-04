@@ -59,4 +59,8 @@ public class GlobalException {
     public ResponseEntity<String> handleBinNotFoundEx(BinNotFoundEx ex){
         return new ResponseEntity<>(ex.getMessage(),HttpStatus.BAD_REQUEST);
     }
+    @ExceptionHandler(ZoneAlreadyExistsEx.class)
+    public ResponseEntity<String> handleZoneAlreadyExistsEx(ZoneAlreadyExistsEx ex){
+        return new ResponseEntity<>(ex.getMessage(),HttpStatus.BAD_REQUEST);
+    }
 }
