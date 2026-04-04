@@ -24,4 +24,6 @@ public interface ZoneRepo extends JpaRepository<Zone,Long> {
     Zone findByTypeAndWarehouseId(ZoneType zoneType, long warehouseId);
 
     Optional<Zone> findByIdAndWarehouseId(long id, long warehouseId);
+
+    boolean existsByNameAndTypeAndWarehouseId(ZoneName name, ZoneType type, long warehouseId);
 }

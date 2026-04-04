@@ -1,6 +1,7 @@
 package com.infotact.warehouse_management_system.Controller;
 
 import com.infotact.warehouse_management_system.DTO.Request.ZoneAddReq;
+import com.infotact.warehouse_management_system.DTO.Request.ZoneUpdateReq;
 import com.infotact.warehouse_management_system.DTO.Response.ZoneAddRes;
 import com.infotact.warehouse_management_system.DTO.Response.ZoneDeletedRes;
 import com.infotact.warehouse_management_system.DTO.Wrapper.ZoneRes;
@@ -39,7 +40,7 @@ public class ZoneController {
     @PutMapping("/update/by-id/{id}")
     public ResponseEntity<?> updateZoneById(
             @PathVariable long id,
-            @RequestBody @Valid ZoneAddReq req){
+            @RequestBody @Valid ZoneUpdateReq req){
         ZoneAddRes res = zoneService.updateZoneById(id, req);
         return ResponseEntity.ok(res);
     }
