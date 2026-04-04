@@ -107,5 +107,18 @@ public class ZoneService {
                 zone.isActive(),
                 zone.getWarehouse().getId());
     }
+    @Transactional
+    public String restoreZoneById(long id){
+        Zone zone = zoneRepo.findById(id)
+                .orElseThrow(()-> new ZoneNotFoundEx("Zone not found with id: "+id));
 
+        if(zone.isActive()){
+            throw new RuntimeException("This zone already restored with id: "+id);
+        }
+
+        zone.setActive(true);
+        zoneRepo.save(zone);
+
+        return "Zone successfully restored with id: "+id;
+    }
 }

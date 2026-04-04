@@ -43,4 +43,9 @@ public class ZoneController {
         ZoneAddRes res = zoneService.updateZoneById(id, req);
         return ResponseEntity.ok(res);
     }
+    @PutMapping("/restore/by-id/{id}")
+    public ResponseEntity<?> restoreZoneById(
+            @PathVariable long id){
+        return ResponseEntity.ok(zoneService.restoreZoneById(id));
+    }
 }
