@@ -7,6 +7,7 @@ import com.infotact.warehouse_management_system.DTO.Wrapper.AisleRes;
 import com.infotact.warehouse_management_system.DTO.Wrapper.BinRes;
 import com.infotact.warehouse_management_system.DTO.Wrapper.WarehouseRes;
 import com.infotact.warehouse_management_system.DTO.Wrapper.ZoneRes;
+import com.infotact.warehouse_management_system.Enum.WarehouseLocation;
 import com.infotact.warehouse_management_system.Exception.WarehouseExistsEx;
 import com.infotact.warehouse_management_system.Exception.WarehouseNotFoundEx;
 import com.infotact.warehouse_management_system.Model.Aisle;
@@ -168,20 +169,62 @@ public class WarehouseService {
     public WarehouseAddRes updateWarehouse(long warehouseId, WarehouseUpdateReq req){
 
         Warehouse warehouse = warehouseRepo.findById(warehouseId)
-                .orElseThrow(()-> new WarehouseNotFoundEx("Warehouse not found with id: "+warehouseId));
+                .orElseThrow(() ->
+                        new WarehouseNotFoundEx("Warehouse not found with id: " + warehouseId));
 
-        if(!warehouse.isActive()){
-            throw new RuntimeException("Warehouse already deleted with id: "+warehouseId +"\nSo you can't update in it");
+        // already deleted
+        if (!warehouse.isActive()) {
+            throw new RuntimeException(
+                    "Warehouse already deleted with id: " + warehouseId
+            );
+        }
+        String newName = req.getName();
+        WarehouseLocation newLocation = req.getLocation();
+
+        // if both null -> nothing to update
+        if (newName == null && newLocation == null) {
+            throw new RuntimeException("Nothing to update");
         }
 
-        // update fields
-        warehouse.setName(req.getName());
-        warehouse.setLocation(req.getLocation());
-        warehouseRepo.save(warehouse);
+        // if new value same as old value
+        if (
+                (newName != null && newName.equals(warehouse.getName())) &&
+                        (newLocation != null && newLocation.equals(warehouse.getLocation()))
+        ) {
+            throw new RuntimeException("No changes found");
+        }
+        else if (newName != null && newName.equals(warehouse.getName())) {
+            throw new RuntimeException("New and old warehouse name are same!");
+        }
+        else if(newLocation != null && newLocation.equals(warehouse.getLocation())){
+            throw new RuntimeException("New and old warehouse location are same!");
+        }
 
-        // response
-        return new WarehouseAddRes(warehouse.getId(),
-                warehouse.getName(), warehouse.getLocation(), warehouse.isActive());
+        // duplicate check -> only if both provided
+        if (newName != null && newLocation != null && warehouseRepo.existsByNameAndLocation(newName, newLocation)) {
+
+            throw new WarehouseExistsEx(
+                    "Warehouse already exists with name: " + newName +
+                            " and location: " + newLocation
+            );
+        }
+
+        // update only changed fields
+        if (newName != null && !newName.isBlank()) {
+            warehouse.setName(newName);
+        }
+        if (newLocation != null) {
+            warehouse.setLocation(newLocation);
+        }
+
+        // save
+        warehouseRepo.save(warehouse);
+        return new WarehouseAddRes(
+                warehouse.getId(),
+                warehouse.getName(),
+                warehouse.getLocation(),
+                warehouse.isActive()
+        );
     }
     @Transactional
     public WarehouseDeletedRes deleteWarehouseById(long id){
@@ -201,5 +244,19 @@ public class WarehouseService {
         response.setMessage("Warehouse deleted successfully with id: " + id);
 
         return response;
+    }
+    @Transactional
+    public String restoreWarehouseById(long id){
+
+        Warehouse warehouse = warehouseRepo.findById(id)
+                .orElseThrow(()-> new WarehouseNotFoundEx("Warehouse not found with id: "+id));
+
+        if(warehouse.isActive()){
+            throw new RuntimeException("This Warehouse already restored with id: "+id);
+        }
+        warehouse.setActive(true);
+        warehouseRepo.save(warehouse);
+
+        return "Warehouse successfully restored with id: "+id;
     }
 }

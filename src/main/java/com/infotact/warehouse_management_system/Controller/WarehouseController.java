@@ -52,8 +52,12 @@ public class WarehouseController {
         return ResponseEntity.ok(res);
     }
     @DeleteMapping("/delete/warehouse/by-id/{id}")
-    public ResponseEntity<?> deleteWarehouseById(Long id){
+    public ResponseEntity<?> deleteWarehouseById(@PathVariable Long id){
         WarehouseDeletedRes res = warehouseService.deleteWarehouseById(id);
         return ResponseEntity.ok(res);
+    }
+    @PutMapping("/restore/warehouse/by-id/{id}")
+    public ResponseEntity<?> restoreWarehouseById(@PathVariable Long id){
+        return ResponseEntity.ok(warehouseService.restoreWarehouseById(id));
     }
 }
