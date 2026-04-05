@@ -37,4 +37,8 @@ public class AisleController {
     public ResponseEntity<?> deleteAisleById(@PathVariable long id){
         return ResponseEntity.ok(aisleService.deleteAisleById(id));
     }
+    @PutMapping("/restore-aisle/by-id/{id}")
+    public ResponseEntity<?> restoreAisleById(@PathVariable long id){
+        return ResponseEntity.ok(aisleService.restoreAisleById(id));
+    }
 }

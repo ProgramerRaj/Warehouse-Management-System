@@ -9,9 +9,5 @@ import lombok.Data;
 @AllArgsConstructor
 public class AisleUpdateReq {
 
-    @NotNull(message = "Aisle name must be required")
     private AisleName name;
-
-    @NotNull(message = "Zone id must be required")
-    private long zoneId;
 }
