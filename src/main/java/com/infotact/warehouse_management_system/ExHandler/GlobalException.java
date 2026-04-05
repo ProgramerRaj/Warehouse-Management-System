@@ -63,4 +63,8 @@ public class GlobalException {
     public ResponseEntity<String> handleZoneAlreadyExistsEx(ZoneAlreadyExistsEx ex){
         return new ResponseEntity<>(ex.getMessage(),HttpStatus.BAD_REQUEST);
     }
+    @ExceptionHandler(AisleAlreadyExistsEx.class)
+    public ResponseEntity<String> handleAisleAlreadyExistsEx(AisleAlreadyExistsEx ex){
+        return new ResponseEntity<>(ex.getMessage(),HttpStatus.BAD_REQUEST);
+    }
 }
