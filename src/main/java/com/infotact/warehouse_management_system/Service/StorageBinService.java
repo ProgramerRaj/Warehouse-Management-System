@@ -64,11 +64,17 @@ public class StorageBinService {
 
     @Transactional
     public BinAddRes updateBinById(long id, BinUpdateReq req){
-        StorageBin bin = storageBinRepo.findByIdAndAisleId(id,req.getAisleId())
-                .orElseThrow(()-> new BinNotFoundEx("This bin not found with id: "+id+" in this aisle with id: "+req.getAisleId()));
+        StorageBin bin = storageBinRepo.findById(id)
+                .orElseThrow(()-> new BinNotFoundEx("Bin not found with id: "+id));
 
         if(!bin.isActive()){
             throw new RuntimeException("This bin already deleted with id: "+id+"\nSo you can't update it now");
+        }
+
+        Integer newMaxCapacity = req.getMaxCapacity();
+
+        if(newMaxCapacity == null || newMaxCapacity.equals(bin.getMaxCapacity())){
+            throw new RuntimeException("No changes found");
         }
 
         // if new maxCapacity less than old usedCapacity
@@ -123,5 +129,18 @@ public class StorageBinService {
                 bin.isActive(),
                 bin.getAisle().getId()
         );
+    }
+    @Transactional
+    public String restoreBinById(long id){
+        StorageBin bin = storageBinRepo.findById(id)
+                .orElseThrow(()-> new BinNotFoundEx("Bin not found with id: "+id));
+
+        if(bin.isActive()){
+            throw new RuntimeException("Bin already restored with id: "+id);
+        }
+        bin.setActive(true);
+        storageBinRepo.save(bin);
+
+        return "Bin successfully restored with id: "+id;
     }
 }

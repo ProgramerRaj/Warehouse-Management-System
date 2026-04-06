@@ -39,4 +39,9 @@ public class BinController {
             @RequestBody @Valid BinUpdateReq req){
         return ResponseEntity.ok(storageBinService.updateBinById(id, req));
     }
+    @PutMapping("/restore-bin/by-id/{id}")
+    public ResponseEntity<?> restoreBinById(
+            @PathVariable long id){
+        return ResponseEntity.ok(storageBinService.restoreBinById(id));
+    }
 }
