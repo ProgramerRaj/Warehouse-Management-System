@@ -3,7 +3,6 @@ package com.infotact.warehouse_management_system.ExHandler;
 import com.infotact.warehouse_management_system.Exception.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -67,4 +66,9 @@ public class GlobalException {
     public ResponseEntity<String> handleAisleAlreadyExistsEx(AisleAlreadyExistsEx ex){
         return new ResponseEntity<>(ex.getMessage(),HttpStatus.BAD_REQUEST);
     }
+    @ExceptionHandler(InventoryNotFoundEx.class)
+    public ResponseEntity<String> handleInventoryNotFoundEx(InventoryNotFoundEx ex){
+        return new ResponseEntity<>(ex.getMessage(),HttpStatus.BAD_REQUEST);
+    }
+
 }

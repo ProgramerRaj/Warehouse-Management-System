@@ -1,9 +1,10 @@
 package com.infotact.warehouse_management_system.Service;
 
 import com.infotact.warehouse_management_system.DTO.Request.ProductAddReq;
+import com.infotact.warehouse_management_system.DTO.Request.ProductReceiveReq;
 import com.infotact.warehouse_management_system.DTO.Response.ProResponse;
 import com.infotact.warehouse_management_system.Enum.ZoneType;
-import com.infotact.warehouse_management_system.Exception.ProductExistsEx;
+import com.infotact.warehouse_management_system.Exception.InventoryNotFoundEx;
 import com.infotact.warehouse_management_system.Exception.ProductNotFoundEx;
 import com.infotact.warehouse_management_system.Exception.WarehouseNotFoundEx;
 import com.infotact.warehouse_management_system.Model.*;
@@ -79,8 +80,57 @@ public class ProductService {
         );
         return response;
     }
+    @Transactional
+    public String receiveProductQua(ProductReceiveReq req){
 
-    // Local methodes
+        Product product = productRepo.findByIdAndWarehouseId(req.getProId(), req.getWarehouseId())
+                .orElseThrow(()-> new ProductNotFoundEx("Product not found with id: "+req.getProId()+
+                        " in warehouse with id: "+req.getWarehouseId()));
+
+        if(!product.isActive()){
+            throw new RuntimeException("Product already deleted with id: "+product.getId());
+        }
+
+        List<Inventory> inventories = inventoryRepo.findByProductId(product.getId());
+        Long warehouseId = req.getWarehouseId();
+
+        for(Inventory inventory : inventories) {
+
+            StorageBin bin = inventory.getBin();
+            Long binWarehouseId = bin.getAisle().getZone().getWarehouse().getId();
+
+                if (!binWarehouseId.equals(warehouseId)) {
+                    continue;
+                }
+
+            int availableSpace = bin.getMaxCapacity() - bin.getUsedCapacity();
+
+            if (availableSpace >= req.getQuantity()) {
+
+                // update bin capacity and inventory
+                bin.setUsedCapacity(bin.getUsedCapacity() + req.getQuantity());
+                inventory.setQuantity(inventory.getQuantity() + req.getQuantity());
+
+                binRepo.save(bin);
+                inventoryRepo.save(inventory);
+
+                // response
+                return "Product quantity successfully received with id: " + req.getProId();
+            }
+        }
+        // No space -> find new bin
+        StorageBin newBin = findAvailableBin(
+                warehouseId,
+                product.getCategory().getZoneType(),
+                req.getQuantity()
+        );
+
+        createInventory(product, newBin, req.getQuantity());
+
+        // response
+        return "Product quantity successfully received with id: " + req.getProId();
+    }
+    // Local methods
     private String generateSKU(String proCategory,String proName){
         String catCode = proCategory.substring(0,3).toUpperCase();
         String proCode = proName.substring(0,3).toUpperCase();
@@ -102,8 +152,8 @@ public class ProductService {
 
             StorageBin bin = inv.getBin();
             Long binWarehouseId = bin.getAisle().getZone().getWarehouse().getId();
-
-            if (!binWarehouseId.equals(warehouseId)) {
+            {
+            if (!binWarehouseId.equals(warehouseId))
                 continue;
             }
             int availableSpace = bin.getMaxCapacity() - bin.getUsedCapacity();
@@ -120,7 +170,7 @@ public class ProductService {
             }
         }
 
-        // 👉 No space → find new bin
+        // No space -> find new bin
         StorageBin newBin = findAvailableBin(
                 warehouseId,
                 request.getCategory().getZoneType(),

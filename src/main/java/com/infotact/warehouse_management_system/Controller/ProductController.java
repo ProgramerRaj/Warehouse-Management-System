@@ -1,6 +1,7 @@
 package com.infotact.warehouse_management_system.Controller;
 
 import com.infotact.warehouse_management_system.DTO.Request.ProductAddReq;
+import com.infotact.warehouse_management_system.DTO.Request.ProductReceiveReq;
 import com.infotact.warehouse_management_system.DTO.Response.ProResponse;
 import com.infotact.warehouse_management_system.Service.ProductService;
 import jakarta.validation.Valid;
@@ -25,6 +26,11 @@ public class ProductController {
     ) {
         return ResponseEntity.ok(productService.addProduct(warehouseId, request));
     }
+    @PutMapping("/receive-product-quantity")
+    public ResponseEntity<?> receiveProductQuantity(
+            @RequestBody @Valid ProductReceiveReq req){
+        return ResponseEntity.ok(productService.receiveProductQua(req));
+    }
 
     // Get product by id
     @GetMapping("/get/{id}")
@@ -33,4 +39,5 @@ public class ProductController {
     ){
         return ResponseEntity.ok(productService.getProduct(id));
     }
+
 }
