@@ -28,4 +28,7 @@ public class Warehouse {
     private List<Product> products;
 
     private boolean active;
+
+    @OneToMany(cascade = CascadeType.PERSIST,mappedBy = "warehouse",fetch = FetchType.LAZY)
+    private List<Order> orders;
 }

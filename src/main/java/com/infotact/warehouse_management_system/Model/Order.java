@@ -19,6 +19,12 @@ public class Order {
     @OneToMany(cascade = CascadeType.ALL,mappedBy = "order",fetch = FetchType.LAZY)
     private List<OrderItem> orderItems = new ArrayList<>();
 
+    private double totalAmount;
+
     @Enumerated(EnumType.STRING)
     private OrderStatus status;
+
+    @ManyToOne
+    @JoinColumn(name = "warehouse_id")
+    private Warehouse warehouse;
 }
