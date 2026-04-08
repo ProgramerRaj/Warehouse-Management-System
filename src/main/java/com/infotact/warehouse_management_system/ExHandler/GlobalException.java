@@ -70,5 +70,16 @@ public class GlobalException {
     public ResponseEntity<String> handleInventoryNotFoundEx(InventoryNotFoundEx ex){
         return new ResponseEntity<>(ex.getMessage(),HttpStatus.BAD_REQUEST);
     }
-
+    @ExceptionHandler(OrderNotFoundEx.class)
+    public ResponseEntity<String> handleOrderNotFoundEx(OrderNotFoundEx ex){
+        return new ResponseEntity<>(ex.getMessage(),HttpStatus.BAD_REQUEST);
+    }
+    @ExceptionHandler(InvalidOrderFlowEx.class)
+    public ResponseEntity<String> invalidOrderFlowEx(InvalidOrderFlowEx ex){
+        return new ResponseEntity<>(ex.getMessage(),HttpStatus.BAD_REQUEST);
+    }
+    @ExceptionHandler(InsufficientStockEx.class)
+    public ResponseEntity<String> handleInsufficientStockEx(InsufficientStockEx ex){
+        return new ResponseEntity<>(ex.getMessage(),HttpStatus.BAD_REQUEST);
+    }
 }
