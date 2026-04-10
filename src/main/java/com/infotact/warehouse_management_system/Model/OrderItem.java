@@ -25,4 +25,7 @@ public class OrderItem {
     @ManyToOne
     @JoinColumn(name = "order_id")
     private Order order;
+
+    @Column(name = "remaining_qua")
+    private int remainingQua;
 }
