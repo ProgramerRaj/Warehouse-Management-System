@@ -1,9 +1,9 @@
 package com.infotact.warehouse_management_system.Controller;
 
 import com.infotact.warehouse_management_system.DTO.Request.OrderAddReq;
-import com.infotact.warehouse_management_system.DTO.Request.OrderFulfillReq;
+import com.infotact.warehouse_management_system.DTO.Request.PickRequest;
 import com.infotact.warehouse_management_system.DTO.Response.OrderAddRes;
-import com.infotact.warehouse_management_system.DTO.Response.OrderFulfillRes;
+import com.infotact.warehouse_management_system.DTO.Response.OrderPickingRes;
 import com.infotact.warehouse_management_system.Service.OrderService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,23 +19,41 @@ public class OrderController {
     @Autowired
     OrderService orderService;
 
-    //create order
-    @PostMapping("/order-create")
+    @PostMapping("/order/create")
     public ResponseEntity<?> createOrder(
             @RequestBody @Valid OrderAddReq req)
     {
        OrderAddRes res = orderService.createOrder(req);
        return ResponseEntity.ok(res);
     }
-
-    // update order status in single API
-    @PutMapping("/fulfill/by-id/{orderId}")
-    public ResponseEntity<OrderFulfillRes> fulfillOrder(
-            @PathVariable Long orderId,
-            @Valid @RequestBody OrderFulfillReq req){
+    @GetMapping("/order/{orderId}/picking")
+    public ResponseEntity<OrderPickingRes> orderPicking(
+            @PathVariable Long orderId){
 
         return ResponseEntity.ok(
-                orderService.updateOrderStatus(orderId, req)
+                orderService.orderPicking(orderId)
         );
+    }
+    @PutMapping("/order/{orderId}/pick")
+    public ResponseEntity<?> orderPicked(
+            @PathVariable Long orderId,
+            @RequestBody @Valid PickRequest req){
+
+        return ResponseEntity.ok(
+                orderService.orderPicked(orderId, req));
+    }
+    @PutMapping("/order/{orderId}/pack")
+    public ResponseEntity<?> orderPacked(
+            @PathVariable Long orderId){
+
+        return ResponseEntity.ok(
+                orderService.orderPacked(orderId)
+        );
+    }
+    @PostMapping("/order/{orderId}/ship")
+    public ResponseEntity<?> orderShip(
+            @PathVariable Long orderId){
+
+        return ResponseEntity.ok(orderService.orderShipped(orderId));
     }
 }
