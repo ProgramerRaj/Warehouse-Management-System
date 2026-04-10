@@ -82,4 +82,8 @@ public class GlobalException {
     public ResponseEntity<String> handleInsufficientStockEx(InsufficientStockEx ex){
         return new ResponseEntity<>(ex.getMessage(),HttpStatus.BAD_REQUEST);
     }
+    @ExceptionHandler(OrderItemNotFoundEx.class)
+    public ResponseEntity<String> handleOrderItemNotFoundEx(OrderItemNotFoundEx ex){
+        return new ResponseEntity<>(ex.getMessage(),HttpStatus.BAD_REQUEST);
+    }
 }
