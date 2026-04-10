@@ -21,4 +21,6 @@ public interface ProductRepo extends JpaRepository<Product,Long> {
     Optional<Product> findByNameAndCategoryAndWarehouseId(String name, ProductCategory category, long warehouseId);
 
     Optional<Product> findByIdAndWarehouseId(Long proId, Long warehouseId);
+
+    Optional<Product> findBySku(String sku);
 }
