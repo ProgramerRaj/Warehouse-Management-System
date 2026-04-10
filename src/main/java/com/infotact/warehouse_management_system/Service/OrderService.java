@@ -1,12 +1,17 @@
 package com.infotact.warehouse_management_system.Service;
 
 import com.infotact.warehouse_management_system.DTO.Request.OrderAddReq;
-import com.infotact.warehouse_management_system.DTO.Request.OrderFulfillReq;
+import com.infotact.warehouse_management_system.DTO.Request.PickRequest;
 import com.infotact.warehouse_management_system.DTO.Response.OrderAddRes;
 import com.infotact.warehouse_management_system.DTO.Response.OrderFulfillRes;
+import com.infotact.warehouse_management_system.DTO.Response.OrderPickingRes;
+import com.infotact.warehouse_management_system.DTO.Response.PickItemRes;
+import com.infotact.warehouse_management_system.DTO.Wrapper.BinInfo;
 import com.infotact.warehouse_management_system.DTO.Wrapper.OrderItemReq;
 import com.infotact.warehouse_management_system.DTO.Wrapper.OrderItemRes;
+import com.infotact.warehouse_management_system.DTO.Wrapper.ProductPickInfo;
 import com.infotact.warehouse_management_system.Enum.OrderStatus;
+import com.infotact.warehouse_management_system.Enum.PickStatus;
 import com.infotact.warehouse_management_system.Exception.*;
 import com.infotact.warehouse_management_system.Model.*;
 import com.infotact.warehouse_management_system.Repository.*;
@@ -39,6 +44,9 @@ public class OrderService {
 
     @Autowired
     StorageBinRepo binRepo;
+
+    @Autowired
+    OrderPickItemRepo orderPickItemRepo;
 
     @Transactional
     public OrderAddRes createOrder(OrderAddReq req){
@@ -87,6 +95,7 @@ public class OrderService {
             item.setOrder(order);
             item.setProduct(product);
             item.setQuantity(itemReq.getQuantity());
+            item.setRemainingQua(itemReq.getQuantity());
             item.setPrice(price);
             item.setTotal(total);
 
@@ -123,13 +132,13 @@ public class OrderService {
     }
 
     @Transactional
-    public OrderFulfillRes updateOrderStatus(Long orderId, OrderFulfillReq req){
+    public OrderFulfillRes orderPacked(Long orderId){
 
         Order order = orderRepo.findById(orderId)
                 .orElseThrow(()-> new OrderNotFoundEx("Order not found with id: "+orderId));
 
         OrderStatus current = order.getStatus();
-        OrderStatus next = req.getStatus();
+        OrderStatus next = OrderStatus.PACKED;
 
         if(current.equals(next)){
             throw new RuntimeException("Order already in status -> "+next);
@@ -140,10 +149,8 @@ public class OrderService {
                     "Invalid flow: " + current + " -> " + next);
         }
 
-        // Stock deduct only status is--> PACKED
-        if(next == OrderStatus.PACKED){
-            deductStock(order);
-        }
+        // Stock deduct
+        deductStockFromPicked(order);
 
         order.setStatus(next);
         orderRepo.save(order);
@@ -160,79 +167,59 @@ public class OrderService {
 
         return switch (current){
             case PENDING -> next == OrderStatus.PICKING;
-            case PICKING -> next == OrderStatus.PACKED;
+            case PICKING -> next == OrderStatus.PICKED;
+            case PICKED -> next == OrderStatus.PACKED;
             case PACKED -> next == OrderStatus.SHIPPED;
             default -> false;
         };
     }
     // Local methode
-    private void deductStock(Order order){
+    private void deductStockFromPicked(Order order){
 
-        Long orderWarehouseId = order.getWarehouse().getId();
+        boolean allPicked = order.getOrderItems().stream()
+                .allMatch(item -> item.getRemainingQua() == 0);
 
-        for (OrderItem item : order.getOrderItems()) {
+        if(!allPicked){
+            throw new RuntimeException("All items are not fully picked");
+        }
 
-            isProductExists(item);
-            isProductActive(item);
+        List<OrderPickItem> picks = orderPickItemRepo.findByOrderId(order.getId());
 
-            Long productId = item.getProduct().getId();
-            int remaining = item.getQuantity();
+        if(picks.isEmpty()){
+            throw new RuntimeException("No items picked for this order");
+        }
 
-            List<Inventory> inventories =
-                    inventoryRepo.findByProductId(productId);
+        for (OrderPickItem pick : picks) {
 
-            for (Inventory inv : inventories) {
+            Long productId = pick.getProduct().getId();
+            Long binId = pick.getBin().getId();
+            int pickedQty = pick.getPickedQty();
 
-                StorageBin bin = inv.getBin();
-                Long binWarehouseId = bin.getAisle()
-                        .getZone()
-                        .getWarehouse()
-                        .getId();
+            // Inventory from same bin
+            Inventory inventory = inventoryRepo
+                    .findByProductIdAndBinId(productId, binId)
+                    .orElseThrow(() -> new InventoryNotFoundEx(
+                            "Inventory not found for product " + productId + " in bin " + binId
+                    ));
 
-                // Only same warehouse
-                if (!binWarehouseId.equals(orderWarehouseId)) {
-                    continue;
-                }
+            StorageBin bin = inventory.getBin();
 
-                int available = inv.getQuantity();
-
-                // skip empty inventory
-                if (available <= 0) {
-                    continue;
-                }
-
-                // Full deduction
-                if (available >= remaining) {
-
-                    inv.setQuantity(available - remaining);
-                    bin.setUsedCapacity(bin.getUsedCapacity() - remaining);
-
-                    inventoryRepo.save(inv);
-                    binRepo.save(bin);
-
-                    remaining = 0;
-                    break;
-                }
-
-                // Partial deduction
-                else {
-
-                    inv.setQuantity(0);
-                    bin.setUsedCapacity(bin.getUsedCapacity() - available);
-
-                    remaining -= available;
-
-                    inventoryRepo.save(inv);
-                    binRepo.save(bin);
-                }
-            }
-
-            // Not enough stock
-            if (remaining > 0) {
+            // check product stock
+            if(inventory.getQuantity() < pickedQty){
                 throw new InsufficientStockEx(
-                        "Insufficient stock for product id: " + productId
+                        "Stock mismatch during packing for product: " + productId
                 );
             }
+
+            // Actual deduction
+            inventory.setQuantity(inventory.getQuantity() - pickedQty);
+            bin.setUsedCapacity(bin.getUsedCapacity() - pickedQty);
+
+            inventoryRepo.save(inventory);
+            binRepo.save(bin);
+
+            pick.setStatus(PickStatus.PACKED);
+            orderPickItemRepo.save(pick);
         }
     }
     // Local methode
@@ -246,5 +233,198 @@ public class OrderService {
         if(!item.getProduct().isActive()){
             throw new RuntimeException("Product inactive with id: "+item.getProduct().getId());
         }
+    }
+
+    @Transactional
+    public OrderPickingRes orderPicking(Long orderId){
+        Order order = orderRepo.findById(orderId)
+                .orElseThrow(()-> new OrderNotFoundEx("Order not found with id: "+orderId));
+
+        OrderStatus current = order.getStatus();
+        OrderStatus next = OrderStatus.PICKING;
+
+        if(current.equals(next)){
+            throw new RuntimeException("Order already in status -> "+next);
+        }
+        if(!isValidFlow(current, next)){
+            throw new InvalidOrderFlowEx(
+                    "Invalid flow: " + current + " -> " + next);
+        }
+
+        // Response
+        OrderPickingRes res = new OrderPickingRes();
+        res.setOrderId(orderId);
+
+        // set product info in ProductPickInfo DTO
+        List<ProductPickInfo> productInfoList = new ArrayList<>();
+
+        Long orderWarehouseId = order.getWarehouse().getId();
+
+        for (OrderItem item : order.getOrderItems()){
+
+            isProductExists(item);
+            isProductActive(item);
+
+            Long productId = item.getProduct().getId();
+
+            ProductPickInfo productInfo = new ProductPickInfo();
+            productInfo.setProId(productId);
+            productInfo.setProName(item.getProduct().getName());
+            productInfo.setRequiredQty(item.getQuantity());
+
+            // set product bins
+            List<Inventory> inventories =
+                    inventoryRepo.findByProductId(item.getProduct().getId());
+
+            List<BinInfo> binInfoList = new ArrayList<>();
+            for(Inventory inv : inventories){
+
+                StorageBin bin = inv.getBin();
+                Long binWarehouseId = bin.getAisle()
+                        .getZone()
+                        .getWarehouse()
+                        .getId();
+
+                // Only same warehouse
+                if (!binWarehouseId.equals(orderWarehouseId)) {
+                    continue;
+                }
+
+                BinInfo binInfo = new BinInfo();
+                binInfo.setWarehouse(item.getProduct().getWarehouse().getName());
+                binInfo.setZone(bin.getAisle().getZone().getName());
+                binInfo.setAisle(bin.getAisle().getName());
+                binInfo.setBinId(bin.getId());
+                binInfo.setAvailableQty(bin.getUsedCapacity());
+
+                binInfoList.add(binInfo);
+            }
+            productInfo.setBins(binInfoList);
+            productInfoList.add(productInfo);
+        }
+        res.setItems(productInfoList);
+        order.setStatus(OrderStatus.PICKING);
+        return res;
+    }
+    @Transactional
+    public PickItemRes orderPicked(Long orderId, PickRequest req){
+
+        Order order = orderRepo.findById(orderId)
+                .orElseThrow(()-> new OrderNotFoundEx("Order not found with id: "+orderId));
+
+        OrderStatus current = order.getStatus(); // PICKING
+        OrderStatus next = OrderStatus.PICKED; // When after all item picked
+
+        if(current.equals(next)){
+            throw new RuntimeException("Order already in status -> "+current);
+        }
+        if(!isValidFlow(current,next)){
+            throw new InvalidOrderFlowEx("Invalid order flow: "+
+                    current + " -> "+next);
+        }
+        Product product = productRepo.findBySku(req.getSku())
+                .orElseThrow(()-> new ProductNotFoundEx("Invalid barcode"));
+
+        OrderItem item = orderItemRepo.findByOrderIdAndProductId(orderId, product.getId())
+                .orElseThrow(()-> new OrderItemNotFoundEx("Product not in order"));
+
+        if(item.getRemainingQua() <= 0){
+            throw new RuntimeException("Item already picked");
+        }
+
+        Inventory inventory = inventoryRepo.
+                findByProductIdAndBinId(product.getId(), req.getBinId())
+                .orElseThrow(()-> new InventoryNotFoundEx("Inventory not found with product ID: " +
+                        product.getId() + " and " + "Bin ID: " + req.getBinId()));
+
+        StorageBin bin = inventory.getBin();
+
+        if(inventory.getQuantity() <= 0){
+            throw new RuntimeException("No stock in this bin with Id: "+ bin.getId());
+        }
+        // Over-picking validation (TOTAL picked from all bins)
+        Integer totalPicked = orderPickItemRepo
+                .sumPickedQty(orderId, product.getId());
+
+        if(totalPicked == null){
+            totalPicked = 0;
+        }
+
+        if(totalPicked + req.getPickedQty() > item.getQuantity()){
+            throw new RuntimeException("Over picking not allowed");
+        }
+        // Save / Update OrderPickItem
+        OrderPickItem pickItem = orderPickItemRepo
+                .findByOrderIdAndProductIdAndBinId(
+                        orderId,
+                        product.getId(),
+                        req.getBinId()
+                )
+                .orElse(null);
+
+        if(pickItem == null){
+            pickItem = new OrderPickItem();
+            pickItem.setOrderId(orderId);
+            pickItem.setOrderItemId(item.getId());
+            pickItem.setProduct(product);
+            pickItem.setBin(bin);
+            pickItem.setPickedQty(req.getPickedQty());
+            pickItem.setStatus(PickStatus.PICKED);
+        } else {
+            pickItem.setPickedQty(pickItem.getPickedQty() + req.getPickedQty());
+        }
+
+        orderPickItemRepo.save(pickItem);
+
+        // Update remaining quantity
+        item.setRemainingQua(item.getQuantity() - (totalPicked + req.getPickedQty()));
+        orderItemRepo.save(item);
+
+        // If all items picked -> order status update
+        boolean allPicked = order.getOrderItems().stream()
+                .allMatch(i -> i.getRemainingQua() == 0);
+
+        if(allPicked){
+            order.setStatus(OrderStatus.PICKED);
+            orderRepo.save(order);
+        }
+
+        // Response
+        PickItemRes res = new PickItemRes();
+
+        res.setOrderId(order.getId());
+        res.setOrderItemId(item.getId());
+        res.setProductName(product.getName());
+        res.setRequiredQty(item.getQuantity());
+        res.setPickedQty(req.getPickedQty());
+        int remaining = item.getQuantity() - (totalPicked + req.getPickedQty());
+        res.setRemainingQty(remaining);
+
+        return res;
+    }
+    @Transactional
+    public OrderFulfillRes orderShipped(Long orderId){
+
+        Order order = orderRepo.findById(orderId)
+                .orElseThrow(() -> new OrderNotFoundEx("Order not found with id: " + orderId));
+
+        OrderStatus current = order.getStatus();
+        OrderStatus next = OrderStatus.SHIPPED;
+
+        if(current.equals(next)){
+            throw new RuntimeException("Order already in status -> " + next);
+        }
+
+        if(!isValidFlow(current, next)){
+            throw new InvalidOrderFlowEx(
+                    "Invalid flow: " + current + " -> " + next);
+        }
+        order.setStatus(next);
+        return new OrderFulfillRes(
+                order.getId(),
+                current,
+                next,
+                "Order successfully SHIPPED"
+        );
     }
 }
