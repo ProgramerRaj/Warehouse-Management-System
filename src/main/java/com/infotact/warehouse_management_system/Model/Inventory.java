@@ -1,6 +1,7 @@
 package com.infotact.warehouse_management_system.Model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Positive;
 import lombok.Data;
 
 @Entity
@@ -20,6 +21,8 @@ public class Inventory {
     @JoinColumn(name = "bin_id")
     private StorageBin bin;
 
+    @Column(nullable = false)
+    @Positive(message = "Quantity cannot be negative")
     private int quantity;
     
 }
