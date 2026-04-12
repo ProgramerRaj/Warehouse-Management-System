@@ -13,12 +13,13 @@ public class ProResponse {
     private double sellingPrice;
     private String description;
     private String sku;
+    private String barcode;
     private ProductCategory category;
     private boolean active;
     private long warehouseId;
 
     // Parameterise constructor
-    public ProResponse(long productId, String proName, double mrp, double discount, double sellingPrice, String description, String sku, ProductCategory category, boolean active, long warehouseId) {
+    public ProResponse(long productId, String proName, double mrp, double discount, double sellingPrice, String description, String sku, String barcode, ProductCategory category, boolean active, long warehouseId) {
         this.productId = productId;
         this.proName = proName;
         this.mrp = mrp;
@@ -26,6 +27,7 @@ public class ProResponse {
         this.sellingPrice = sellingPrice;
         this.description = description;
         this.sku = sku;
+        this.barcode = barcode;
         this.category = category;
         this.active = active;
         this.warehouseId = warehouseId;
