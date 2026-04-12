@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "order_pick_items",
         uniqueConstraints = {
@@ -46,15 +48,15 @@ public class OrderPickItem {
     private PickStatus status;
 
     @Column(name = "created_at", updatable = false)
-    private Long createdAt;
+    private LocalDateTime createdAt;
 
     @Column(name = "updated_at")
-    private Long updatedAt;
+    private LocalDateTime updatedAt;
 
-    // Auto set timestamps
+    // Auto set Date and Time
     @PrePersist
     public void prePersist() {
-        long time = System.currentTimeMillis();
+        LocalDateTime time = LocalDateTime.now();
         this.createdAt = time;
         this.updatedAt = time;
 
@@ -65,6 +67,6 @@ public class OrderPickItem {
 
     @PreUpdate
     public void preUpdate() {
-        this.updatedAt = System.currentTimeMillis();
+        this.updatedAt = LocalDateTime.now();
     }
 }
