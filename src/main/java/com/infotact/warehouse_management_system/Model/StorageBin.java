@@ -2,6 +2,7 @@ package com.infotact.warehouse_management_system.Model;
 
 import com.infotact.warehouse_management_system.Enum.BinCode;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Positive;
 import lombok.Data;
 
 import java.util.ArrayList;
@@ -19,8 +20,12 @@ public class StorageBin {
     @Column(name = "bin_code",unique = true)
     private String binCode;
 
+    @Column(nullable = false)
+    @Positive(message = "Max capacity cannot be negative in Bin")
     private int maxCapacity;
 
+    @Column(nullable = false)
+    @Positive(message = "Used capacity cannot be negative in Bin")
     private int usedCapacity;
 
     private boolean active;
