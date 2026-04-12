@@ -35,6 +35,15 @@ public class Product {
     @Column(unique = true)
     private String sku; // --- Stock keeping Unit ----
 
+    @Column(unique = true)
+    private String barcode;
+
+    @Lob
+    private byte[] barcodeImage;
+
+    @Lob
+    private byte[] qrCodeImage;
+
     @OneToMany(cascade = CascadeType.ALL,mappedBy = "product",fetch = FetchType.LAZY)
     private List<Inventory> inventories = new ArrayList<>();
 
