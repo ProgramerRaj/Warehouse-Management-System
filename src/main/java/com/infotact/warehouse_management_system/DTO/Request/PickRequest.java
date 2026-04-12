@@ -8,8 +8,8 @@ import lombok.Data;
 @Data
 public class PickRequest {
 
-    @NotBlank(message = "Please scan product to barcode")
-    private String sku;
+    @NotBlank(message = "Please scan product barcode")
+    private String barcode;
 
     @NotNull(message = "Please provide bin ID")
     @Positive(message = "Please provide valid bin ID")
