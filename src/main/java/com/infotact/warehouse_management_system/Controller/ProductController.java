@@ -18,7 +18,6 @@ public class ProductController {
     @Autowired
     ProductService productService;
 
-    // Add product
     @PostMapping("/add-product")
     public ResponseEntity<ProResponse> addProduct(
             @RequestParam(required = true) long warehouseId,
@@ -26,18 +25,36 @@ public class ProductController {
     ) {
         return ResponseEntity.ok(productService.addProduct(warehouseId, request));
     }
+
     @PutMapping("/receive-product-quantity")
     public ResponseEntity<?> receiveProductQuantity(
             @RequestBody @Valid ProductReceiveReq req){
         return ResponseEntity.ok(productService.receiveProductQua(req));
     }
 
-    // Get product by id
-    @GetMapping("/get/{id}")
+    @GetMapping("/product/get")
     public ResponseEntity<ProResponse> getProduct(
-            @PathVariable int id
+            @RequestParam(required = false) Long id,
+            @RequestParam(required = false) String barcode,
+            @RequestParam(required = false) String sku
     ){
-        return ResponseEntity.ok(productService.getProduct(id));
+        return ResponseEntity.ok(productService.getProduct(id,barcode,sku));
+    }
+
+    @GetMapping("/product/{id}/barcodeImg")
+    public ResponseEntity<byte[]> getBarcodeImage(@PathVariable Long id){
+
+        return ResponseEntity.ok()
+                .header("Content-Type", "image/png")
+                .body(productService.getBarcodeImage(id));
+    }
+
+    @GetMapping("/product/{id}/qrCodeImg")
+    public ResponseEntity<byte[]> getQrCodeImage(@PathVariable Long id){
+
+        return ResponseEntity.ok()
+                .header("Content-Type", "image/png")
+                .body(productService.getQrCodeImage(id));
     }
 
 }
