@@ -2,6 +2,7 @@ package com.infotact.warehouse_management_system.Model;
 
 import com.infotact.warehouse_management_system.Enum.BinCode;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Positive;
 import lombok.Data;
 
@@ -25,7 +26,7 @@ public class StorageBin {
     private int maxCapacity;
 
     @Column(nullable = false)
-    @Positive(message = "Used capacity cannot be negative in Bin")
+    @Min(value = 0, message = "Used capacity cannot be negative in Bin")
     private int usedCapacity;
 
     private boolean active;
