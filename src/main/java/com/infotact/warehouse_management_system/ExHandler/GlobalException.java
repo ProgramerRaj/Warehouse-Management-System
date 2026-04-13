@@ -1,6 +1,7 @@
 package com.infotact.warehouse_management_system.ExHandler;
 
 import com.infotact.warehouse_management_system.Exception.*;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -85,5 +86,11 @@ public class GlobalException {
     @ExceptionHandler(OrderItemNotFoundEx.class)
     public ResponseEntity<String> handleOrderItemNotFoundEx(OrderItemNotFoundEx ex){
         return new ResponseEntity<>(ex.getMessage(),HttpStatus.BAD_REQUEST);
+    }
+    // handle Invalid values insert in database
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<String> handleDBException(Exception ex){
+        return ResponseEntity.badRequest()
+                .body("Invalid operation: Negative values are not allowed");
     }
 }
