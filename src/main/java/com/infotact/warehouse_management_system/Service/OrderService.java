@@ -202,18 +202,29 @@ public class OrderService {
                             "Inventory not found for product " + productId + " in bin " + binId
                     ));
 
-            StorageBin bin = inventory.getBin();
-
-            // check product stock
-            if(inventory.getQuantity() < pickedQty){
-                throw new InsufficientStockEx(
-                        "Stock mismatch during packing for product: " + productId
-                );
+            // Inventory Capacity Check
+            if(inventory.getQuantity() < pick.getPickedQty()){
+                throw new RuntimeException("Cannot deduct more than available stock with inventory Id: "+inventory.getId());
+            }
+            inventory.setQuantity(
+                    inventory.getQuantity() - pick.getPickedQty()
+            );
+            if(inventory.getQuantity() < 0){
+                throw new RuntimeException("Negative stock not allowed with Inventory Id: "+inventory.getId());
             }
 
-            // Actual deduction
-            inventory.setQuantity(inventory.getQuantity() - pickedQty);
-            bin.setUsedCapacity(bin.getUsedCapacity() - pickedQty);
+            StorageBin bin = inventory.getBin();
+
+            // Bin Capacity Check
+            if(bin.getUsedCapacity() < pick.getPickedQty()){
+                throw new RuntimeException("Invalid bin capacity deduction with Bin Id: "+binId);
+            }
+            bin.setUsedCapacity(
+                    bin.getUsedCapacity() - pick.getPickedQty()
+            );
+            if(bin.getUsedCapacity() < 0){
+                throw new RuntimeException("Negative bin capacity not allowed with bin Id: "+binId);
+            }
 
             inventoryRepo.save(inventory);
             binRepo.save(bin);
@@ -322,7 +333,7 @@ public class OrderService {
             throw new InvalidOrderFlowEx("Invalid order flow: "+
                     current + " -> "+next);
         }
-        Product product = productRepo.findBySku(req.getSku())
+        Product product = productRepo.findByBarcode(req.getBarcode())
                 .orElseThrow(()-> new ProductNotFoundEx("Invalid barcode"));
 
         OrderItem item = orderItemRepo.findByOrderIdAndProductId(orderId, product.getId())
@@ -341,6 +352,14 @@ public class OrderService {
 
         if(inventory.getQuantity() <= 0){
             throw new RuntimeException("No stock in this bin with Id: "+ bin.getId());
+        }
+
+        // check product stock
+        if(inventory.getQuantity() < req.getPickedQty()){
+            throw new InsufficientStockEx(
+                    "Insufficient stock for this product: " + product.getId()
+                    +" during item picked"
+            );
         }
         // Over-picking validation (TOTAL picked from all bins)
         Integer totalPicked = orderPickItemRepo
