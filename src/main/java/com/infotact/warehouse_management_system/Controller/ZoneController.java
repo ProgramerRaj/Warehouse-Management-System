@@ -10,6 +10,7 @@ import com.infotact.warehouse_management_system.Service.ZoneService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,22 +22,33 @@ public class ZoneController {
     @Autowired
     private ZoneService zoneService;
 
+    // ADMIN only
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/add-zone")
     public ResponseEntity<ZoneAddRes> addZone(
             @RequestBody @Valid ZoneAddReq request){
         ZoneAddRes response = zoneService.addZone(request);
         return ResponseEntity.ok(response);
     }
+
+    // ADMIN + OPERATOR
+    @PreAuthorize("hasAnyRole('ADMIN','OPERATOR')")
     @GetMapping("/get-by/{id}")
     public ResponseEntity<?> getZoneById(@PathVariable long id){
         ZoneAddRes res = zoneService.getZoneById(id);
         return ResponseEntity.ok(res);
     }
+
+    // ADMIN only
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/delete/by-id/{id}")
     public ResponseEntity<?> deleteZoneById(@PathVariable long id){
         ZoneDeletedRes res = zoneService.deleteZoneById(id);
         return ResponseEntity.ok(res);
     }
+
+    // ADMIN only
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/update/by-id/{id}")
     public ResponseEntity<?> updateZoneById(
             @PathVariable long id,
@@ -44,6 +56,9 @@ public class ZoneController {
         ZoneAddRes res = zoneService.updateZoneById(id, req);
         return ResponseEntity.ok(res);
     }
+
+    // ADMIN only
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/restore/by-id/{id}")
     public ResponseEntity<?> restoreZoneById(
             @PathVariable long id){

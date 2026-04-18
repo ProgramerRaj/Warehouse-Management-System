@@ -7,6 +7,7 @@ import com.infotact.warehouse_management_system.Service.AisleService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -16,6 +17,8 @@ public class AisleController {
     @Autowired
     private AisleService aisleService;
 
+    // ADMIN only
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/aisle-add")
     public ResponseEntity<AisleAddRes> addAisle(
             @RequestBody @Valid AisleAddReq request
@@ -23,20 +26,32 @@ public class AisleController {
         AisleAddRes response = aisleService.addAisle(request);
         return ResponseEntity.ok(response);
     }
+
+    // ADMIN + OPERATOR
+    @PreAuthorize("hasAnyRole('ADMIN','OPERATOR')")
     @GetMapping("/get-aisle/by-id/{id}")
     public ResponseEntity<?> getAisleById(@PathVariable long id){
         return ResponseEntity.ok(aisleService.getAisleById(id));
     }
+
+    // ADMIN only
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/update-aisle/by-id/{id}")
     public ResponseEntity<?> updateAisleById(
             @PathVariable long id,
             @RequestBody @Valid AisleUpdateReq req){
         return ResponseEntity.ok(aisleService.updateAisleById(id, req));
     }
+
+    // ADMIN only
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/delete-aisle/by-id/{id}")
     public ResponseEntity<?> deleteAisleById(@PathVariable long id){
         return ResponseEntity.ok(aisleService.deleteAisleById(id));
     }
+
+    // ADMIN only
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/restore-aisle/by-id/{id}")
     public ResponseEntity<?> restoreAisleById(@PathVariable long id){
         return ResponseEntity.ok(aisleService.restoreAisleById(id));

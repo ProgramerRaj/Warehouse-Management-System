@@ -221,7 +221,7 @@ public class ProductService {
             }
         }
 
-        // If still remaining → new bin
+        // If still remaining -> new bin
         if (remaining > 0) {
             StorageBin newBin = findAvailableBin(
                     warehouseId,
